@@ -14,18 +14,18 @@ class TranslationVerticle(private val tracer: Tracer) : AbstractVerticle() {
 
     override fun start(startFuture: Future<Void>) {
         val rpcServer = VertxServerBuilder
-            .forAddress(vertx, "0.0.0.0", 8080)
+            .forAddress(vertx, "localhost", 8080)
             .addService(TranslationService())
             .build()
 
         // Start is asynchronous
         rpcServer.start { result ->
             if (result.succeeded()) {
-                println("Translation Grpc service started")
+                log.info("Translation Grpc service started")
                 startFuture.succeeded()
             }
             else {
-                println("Failed to start grpc service")
+                log.error("Failed to start grpc service")
                 startFuture.fail(result.cause())
             }
 
@@ -34,7 +34,10 @@ class TranslationVerticle(private val tracer: Tracer) : AbstractVerticle() {
 }
 
 class TranslationService : TranslationImplBase() {
+    private val log = logger<TranslationService>()
+
     override fun translate(request: TranslationRequest, responseObserver: StreamObserver<TranslationReply>) {
+        log.info("Translating")
         responseObserver.onNext(TranslationReply.newBuilder().setTest("hej hoopp").build())
     }
 }

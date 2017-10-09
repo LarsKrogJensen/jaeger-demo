@@ -14,12 +14,14 @@ import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerConfig.BOOTSTRAP_SERVERS_CONFIG
 import se.lars.common.delay
 import se.lars.common.kafkaHeaderFormat
+import se.lars.common.logger
 import se.lars.translation.TranslationGrpc
 import se.lars.translation.TranslationGrpc.TranslationVertxStub
 import se.lars.translation.TranslationRequest
 
 
 class OFEVerticle(private val tracer: Tracer, private val ofeId: String) : AbstractVerticle() {
+    private val log = logger<OFEVerticle>()
     private lateinit var consumer: KafkaConsumer<String, JsonObject>
     private lateinit var producer: KafkaProducer<String, JsonObject>
     private lateinit var channel: ManagedChannel
@@ -63,7 +65,7 @@ class OFEVerticle(private val tracer: Tracer, private val ofeId: String) : Abstr
             .asChildOf(tracer.extract(kafkaHeaderFormat, record.record().headers()))
             .startActive()
             .use {
-                println("Processing key=${record.key()},value=${record.value()},partition=${record.partition()},offset=${record.offset()},headers=${record.record().headers()}")
+                log.info("Processing key=${record.key()},value=${record.value()},partition=${record.partition()},offset=${record.offset()},headers=${record.record().headers()}")
                 processData()
                 translate()
                 sendToPush(record.value())
@@ -87,8 +89,11 @@ class OFEVerticle(private val tracer: Tracer, private val ofeId: String) : Abstr
     }
 
     private fun translate() {
-        service.translate(TranslationRequest.newBuilder().setTextId(1).build()) {
-            
+        service.translate(TranslationRequest.newBuilder().setTextId(1).build()) { result ->
+            if (result.succeeded())
+                log.info("Translated")
+            else
+                log.error("Failef to translate: ${result.cause().message}")
         }
     }
 }
