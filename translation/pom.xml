@@ -9,22 +9,27 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ofe</artifactId>
+    <artifactId>translation</artifactId>
 
 
     <dependencies>
         <dependency>
             <groupId>se.lars</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>translation-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
+            <groupId>com.uber.jaeger</groupId>
+            <artifactId>jaeger-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
+            <groupId>com.github.davidb</groupId>
+            <artifactId>metrics-influxdb</artifactId>
+        </dependency>
+      
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web</artifactId>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
@@ -32,24 +37,15 @@
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
-            <artifactId>vertx-kafka-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.uber.jaeger</groupId>
-            <artifactId>jaeger-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.davidb</groupId>
-            <artifactId>metrics-influxdb</artifactId>
+            <artifactId>vertx-grpc</artifactId>
         </dependency>
         <dependency>
             <groupId>com.uber.jaeger</groupId>
             <artifactId>jaeger-dropwizard</artifactId>
         </dependency>
-    </dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+        </dependency>
+     </dependencies>
 </project>

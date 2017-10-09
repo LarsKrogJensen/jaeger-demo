@@ -11,5 +11,20 @@
 
     <artifactId>common</artifactId>
 
+    <dependencies>
+
+        <dependency>
+            <groupId>com.uber.jaeger</groupId>
+            <artifactId>jaeger-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

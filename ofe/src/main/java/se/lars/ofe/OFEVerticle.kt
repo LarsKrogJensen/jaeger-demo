@@ -24,7 +24,7 @@ class OFEVerticle(private val tracer: Tracer) : AbstractVerticle() {
             KEY_DESERIALIZER_CLASS_CONFIG to "org.apache.kafka.common.serialization.StringDeserializer",
             VALUE_DESERIALIZER_CLASS_CONFIG to "io.vertx.kafka.client.serialization.JsonObjectDeserializer",
             ENABLE_AUTO_COMMIT_CONFIG to "true",
-            GROUP_ID_CONFIG to "ofe-" + ProcessHandle.current().pid()
+            GROUP_ID_CONFIG to "ofe-1"
         )
         consumer = KafkaConsumer.create<String, JsonObject>(vertx, consumerProps)
         consumer.handler(this::handleEvent)
