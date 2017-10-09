@@ -21,7 +21,8 @@ fun main(args: Array<String>) {
         .build()
     reporter.start(10, TimeUnit.SECONDS)
 
-    val config = Configuration("OT",
+    val ofeId = "OFE-${args[0]}"
+    val config = Configuration(ofeId,
                                SamplerConfiguration(ConstSampler.TYPE, 1),
                                null)
     config.setStatsFactory(StatsFactory(metricRegistry))
@@ -35,7 +36,7 @@ fun main(args: Array<String>) {
     val vertx = Vertx.vertx()
 
 
-    vertx.deployVerticle(OFEVerticle(tracer))
+    vertx.deployVerticle(OFEVerticle(tracer, ofeId))
 }
 
 private fun configureVertxLogging() {

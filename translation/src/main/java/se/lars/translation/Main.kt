@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
     val vertx = vertx()
 
 
-    //vertx.deployVerticle(se.lars.ofe.OFEVerticle(tracer))
+    vertx.deployVerticle(TranslationVerticle(tracer))
 }
 
 private fun configureVertxLogging() {
