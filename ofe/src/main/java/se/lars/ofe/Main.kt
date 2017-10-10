@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
         .build()
     reporter.start(10, TimeUnit.SECONDS)
 
-    val ofeId = "OFE-${args[0]}"
+    val ofeId = args[0]
     val config = Configuration(ofeId,
                                SamplerConfiguration(ConstSampler.TYPE, 1),
                                null)

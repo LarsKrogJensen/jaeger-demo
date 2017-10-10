@@ -5,6 +5,7 @@ import com.uber.jaeger.Configuration
 import com.uber.jaeger.Configuration.SamplerConfiguration
 import com.uber.jaeger.dropwizard.StatsFactory
 import com.uber.jaeger.samplers.ConstSampler
+import io.opentracing.util.GlobalTracer
 import io.vertx.core.Vertx.vertx
 import metrics_influxdb.HttpInfluxdbProtocol
 import metrics_influxdb.InfluxdbReporter
@@ -18,7 +19,7 @@ fun main(args: Array<String>) {
         .build()
     reporter.start(10, TimeUnit.SECONDS)
 
-    val config = Configuration("OT",
+    val config = Configuration("TNS",
                                SamplerConfiguration(ConstSampler.TYPE, 1),
                                null)
     config.setStatsFactory(StatsFactory(metricRegistry))
@@ -28,7 +29,7 @@ fun main(args: Array<String>) {
 //        .registerExtractor(se.lars.common.kafkaHeaderFormat, se.lars.common.KafkaHeaderCodec())
         .build()
 
-    io.opentracing.util.GlobalTracer.register(tracer)
+    GlobalTracer.register(tracer)
     val vertx = vertx()
 
 

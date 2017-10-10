@@ -2,7 +2,9 @@ package se.lars.ofe
 
 import io.grpc.ManagedChannel
 import io.opentracing.Tracer
+import io.opentracing.contrib.ClientTracingInterceptor
 import io.vertx.core.AbstractVerticle
+import io.vertx.core.AsyncResult
 import io.vertx.core.json.JsonObject
 import io.vertx.grpc.VertxChannelBuilder
 import io.vertx.kafka.client.consumer.KafkaConsumer
@@ -17,6 +19,7 @@ import se.lars.common.kafkaHeaderFormat
 import se.lars.common.logger
 import se.lars.translation.TranslationGrpc
 import se.lars.translation.TranslationGrpc.TranslationVertxStub
+import se.lars.translation.TranslationReply
 import se.lars.translation.TranslationRequest
 
 
@@ -51,8 +54,9 @@ class OFEVerticle(private val tracer: Tracer, private val ofeId: String) : Abstr
             .forAddress(vertx, "localhost", 8080)
             .usePlaintext(true)
             .build()
-        service = TranslationGrpc.newVertxStub(channel)
-
+        val tracingInterceptor = ClientTracingInterceptor(this.tracer)
+//        service = TranslationGrpc.newVertxStub(channel)
+        service = TranslationGrpc.newVertxStub(tracingInterceptor.intercept(channel))
     }
 
     override fun stop() {
@@ -64,11 +68,21 @@ class OFEVerticle(private val tracer: Tracer, private val ofeId: String) : Abstr
         tracer.buildSpan("processOddChange")
             .asChildOf(tracer.extract(kafkaHeaderFormat, record.record().headers()))
             .startActive()
-            .use {
+            .use { span ->
                 log.info("Processing key=${record.key()},value=${record.value()},partition=${record.partition()},offset=${record.offset()},headers=${record.record().headers()}")
                 processData()
-                translate()
-                sendToPush(record.value())
+                val capture = span.capture()
+                translate { result ->
+                    val spanCont = capture.activate()
+                    if (result.succeeded()) {
+                        log.info("Translated")
+
+                    } else {
+                        log.error("Failed to translate: ${result.cause().message}")
+                    }
+                    //sendToPush(record.value())
+                    spanCont.deactivate()
+                }
             }
     }
 
@@ -88,12 +102,11 @@ class OFEVerticle(private val tracer: Tracer, private val ofeId: String) : Abstr
             }
     }
 
-    private fun translate() {
+    private fun translate(callback: (AsyncResult<TranslationReply>) -> Unit) {
+        //val capture = tracer.activeSpan().capture()
         service.translate(TranslationRequest.newBuilder().setTextId(1).build()) { result ->
-            if (result.succeeded())
-                log.info("Translated")
-            else
-                log.error("Failef to translate: ${result.cause().message}")
+            //  capture.activate()
+            callback(result)
         }
     }
 }
